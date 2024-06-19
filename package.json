@@ -1,0 +1,20 @@
+{
+  "name": "react-highlight-search",
+  "version": "1.0.0",
+  "description": "Text highlight with deep search through DOM elements.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "text",
+    "highlight",
+    "search",
+    "deep",
+    "search",
+    "dom"
+  ],
+  "author": "Vladyslav Dotsenko",
+  "license": "MIT"
+}
