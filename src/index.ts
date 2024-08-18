@@ -1,1 +1,1 @@
-export { default as MyComponent } from "./MyComponent";
+export { HighlightSearchWrapper } from "./components";

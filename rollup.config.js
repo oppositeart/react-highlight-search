@@ -4,6 +4,7 @@ import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
+import postcss from "rollup-plugin-postcss";
 
 import packageJson from "./package.json";
 
@@ -42,6 +43,9 @@ export default [
                     drop_debugger: !devMode,
                 },
             }),
+            postcss({
+                minimize: true,
+            }),
         ],
         external: ["react", "react-dom"],
     },
@@ -49,5 +53,6 @@ export default [
         input: "src/index.ts",
         output: [{ file: packageJson.types }],
         plugins: [dts.default()],
+        external: [/\.css/],
     },
 ];
