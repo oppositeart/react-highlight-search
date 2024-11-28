@@ -8,8 +8,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup -c --environment NODE_ENV:development",
-    "build:production": "rollup -c --environment NODE_ENV:production",
+    "build": "rollup -c --environment NODE_ENV:development --bundleConfigAsCjs",
+    "build:production": "rollup -c --environment NODE_ENV:production --bundleConfigAsCjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

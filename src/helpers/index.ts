@@ -7,7 +7,7 @@ import {
 
 // Restores original nodes instead of modified ones
 export const restoreOriginNodes = (
-    changedNodesObject: ChangedNodeObjectType[] | undefined
+    changedNodesObject: ChangedNodeObjectType[] | undefined,
 ) => {
     if (changedNodesObject === undefined) {
         return;
@@ -16,7 +16,7 @@ export const restoreOriginNodes = (
     changedNodesObject.forEach(({ newNodes, oldNode, parentNode }) => {
         const nextSibling = newNodes[newNodes.length - 1].nextSibling || null;
         parentNode?.insertBefore(oldNode, nextSibling);
-        newNodes.forEach((node) => {
+        newNodes.forEach(node => {
             node.remove();
         });
     });
@@ -52,7 +52,7 @@ export const initMatchData = () => {
 export const addSpans = (
     matchDataArr: MatchNodeCombinedDataType[],
     setOriginNodes: (changedNodesObject: ChangedNodeObjectType[]) => void,
-    spanClassName?: string
+    spanClassName?: string,
 ) => {
     const changedNodesObject: ChangedNodeObjectType[] = [];
 
@@ -74,8 +74,8 @@ export const addSpans = (
                 textParts.push(
                     originText?.slice(
                         endPos,
-                        positionsArr[i + 1]?.startPos || originText.length
-                    ) || ""
+                        positionsArr[i + 1]?.startPos || originText.length,
+                    ) || "",
                 );
             }
         });
@@ -114,7 +114,7 @@ export const searchAcrossNodes = (
     textNodes: ChildNode[],
     startPosition: number,
     endPosition: number,
-    matchDataController: MatchDataControllerType
+    matchDataController: MatchDataControllerType,
 ) => {
     let searchBeginIndex = 0;
     let searchEndIndex = 0;

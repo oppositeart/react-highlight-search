@@ -26,5 +26,5 @@ export type ChangedNodeObjectType = {
 export type SetMatchDataType = (
     componentIndex: number,
     count: number,
-    sectionElement: HTMLDivElement | null
+    sectionElement: HTMLDivElement | null,
 ) => void;

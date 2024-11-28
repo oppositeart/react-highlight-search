@@ -16,17 +16,19 @@ import "./styles.css";
 type PageSearchWrapperProps = {
     index: number;
     searchString: string;
+    searchMinLength?: number;
     setMatchData?: SetMatchDataType;
     children: React.ReactElement | JSX.Element;
+    spanClassName?: string;
 };
-
-const SEARCH_MIN_LENGTH = 3;
 
 const HighlightSearchWrapper = ({
     index,
     searchString,
+    searchMinLength = 1,
     setMatchData,
     children,
+    spanClassName = "highlightsearch-selected-element",
 }: PageSearchWrapperProps) => {
     const parentRef = useRef<HTMLDivElement>(null);
     const ref = useRef<HTMLDivElement>(null);
@@ -39,7 +41,7 @@ const HighlightSearchWrapper = ({
         (count: number) => {
             setMatchData?.(index, count, count ? parentRef.current : null);
         },
-        [index, setMatchData]
+        [index, setMatchData],
     );
 
     const searchText = useCallback(
@@ -49,7 +51,7 @@ const HighlightSearchWrapper = ({
             // Restore original Node elements before each search
             restoreOriginNodes(originNodes);
 
-            if (text?.length < SEARCH_MIN_LENGTH) {
+            if (text?.length < (searchMinLength > 0 ? searchMinLength : 1)) {
                 return;
             }
 
@@ -57,7 +59,7 @@ const HighlightSearchWrapper = ({
 
             // Extract text from nodes
             const extractText = (nodes: NodeListOf<ChildNode> | undefined) => {
-                nodes?.forEach((node) => {
+                nodes?.forEach(node => {
                     if (node.nodeType === node.ELEMENT_NODE) {
                         extractText(node.childNodes);
                     } else if (node.nodeType === node.TEXT_NODE) {
@@ -98,15 +100,15 @@ const HighlightSearchWrapper = ({
                     textNodes,
                     match.index,
                     match.index + match[0].length - 1,
-                    matchDataController
+                    matchDataController,
                 );
             }
             setMatchDataFn(matchCount);
 
             // Add spans to selected nodes
-            addSpans(matchData, setOriginNodes, "highlightsearch-selected-element");
+            addSpans(matchData, setOriginNodes, spanClassName);
         },
-        [originNodes, setMatchDataFn]
+        [originNodes, setMatchDataFn],
     );
 
     // Run search if user input is changed
