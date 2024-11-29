@@ -2,7 +2,7 @@ import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 
 import { usePrevious } from "../hooks";
 
-import { ChangedNodeObjectType, SetMatchDataType } from "../types/helpers";
+import { ChangedNodeObjectType, OnMatchDataType } from "../types";
 
 import {
     addSpans,
@@ -17,7 +17,7 @@ type PageSearchWrapperProps = {
     index: number;
     searchString: string;
     searchMinLength?: number;
-    setMatchData?: SetMatchDataType;
+    onMatchData?: OnMatchDataType;
     children: React.ReactElement | JSX.Element;
     spanClassName?: string;
 };
@@ -26,7 +26,7 @@ const HighlightSearchWrapper = ({
     index,
     searchString,
     searchMinLength = 1,
-    setMatchData,
+    onMatchData,
     children,
     spanClassName = "highlightsearch-selected-element",
 }: PageSearchWrapperProps) => {
@@ -39,9 +39,9 @@ const HighlightSearchWrapper = ({
 
     const setMatchDataFn = useCallback(
         (count: number) => {
-            setMatchData?.(index, count, count ? parentRef.current : null);
+            onMatchData?.(index, count, count ? parentRef.current : null);
         },
-        [index, setMatchData],
+        [index, onMatchData],
     );
 
     const searchText = useCallback(

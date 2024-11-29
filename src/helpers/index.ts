@@ -3,7 +3,7 @@ import {
     MatchDataControllerType,
     MatchNodeCombinedDataType,
     MatchNodeDataType,
-} from "../types/helpers";
+} from "../types";
 
 // Restores original nodes instead of modified ones
 export const restoreOriginNodes = (

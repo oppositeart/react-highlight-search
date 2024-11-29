@@ -23,7 +23,7 @@ export type ChangedNodeObjectType = {
     parentNode: ParentNode | null;
 };
 
-export type SetMatchDataType = (
+export type OnMatchDataType = (
     componentIndex: number,
     count: number,
     sectionElement: HTMLDivElement | null,
