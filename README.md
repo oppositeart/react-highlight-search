@@ -1,7 +1,7 @@
 
 # React-Highlight-Search
 
-React Highlight Search is a lightweight and fast ReactJS component *(15.5 kB > 5.7 kB gzip)*, built with Vanilla JS and featuring 0 dependencies, designed for deep text search through the DOM tree.
+React Highlight Search is a lightweight and fast ReactJS component *(17.7 kB > 6.3 kB gzip)*, built with Vanilla JS and featuring 0 dependencies, designed for deep text search through the DOM tree.
 
 # Installation
 

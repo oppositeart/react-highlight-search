@@ -3,4 +3,6 @@ rollup.config.js
 tsconfig.json
 .prettierignore                                      
 .prettierrc
+.github/
 .storybook/
+storybook-static/
