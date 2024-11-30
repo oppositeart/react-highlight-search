@@ -1,7 +1,22 @@
 {
   "name": "react-highlight-search",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Text highlight with deep search through DOM elements.",
+  "keywords": [
+    "react",
+    "text",
+    "highlight",
+    "search",
+    "deep",
+    "dom"
+  ],
+  "author": "Vladyslav Dotsenko",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oppositeart/react-highlight-search.git"
+  },
+  "homepage": "https://github.com/oppositeart/react-highlight-search#readme",
   "type": "module",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.mjs",
@@ -13,16 +28,6 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
-  "keywords": [
-    "react",
-    "text",
-    "highlight",
-    "search",
-    "deep",
-    "dom"
-  ],
-  "author": "Vladyslav Dotsenko",
-  "license": "MIT",
   "devDependencies": {
     "@chromatic-com/storybook": "^1.6.1",
     "@rollup/plugin-commonjs": "^26.0.1",
