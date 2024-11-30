@@ -23,8 +23,10 @@ export type ChangedNodeObjectType = {
     parentNode: ParentNode | null;
 };
 
-export type OnMatchDataType = (
-    componentIndex: number,
-    count: number,
-    sectionElement: HTMLDivElement | null,
-) => void;
+export type OnMatchDataPropsType = {
+    wrapperIndex: number;
+    matchesFound: number;
+    matchParentElement: HTMLDivElement | null;
+};
+
+export type OnMatchDataType = (matchData: OnMatchDataPropsType) => void;

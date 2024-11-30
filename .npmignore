@@ -1,2 +1,6 @@
 src
 rollup.config.js
+tsconfig.json
+.prettierignore                                      
+.prettierrc
+.storybook/

@@ -14,21 +14,21 @@ import {
 import "./styles.css";
 
 type PageSearchWrapperProps = {
-    index: number;
     searchString: string;
     searchMinLength?: number;
     onMatchData?: OnMatchDataType;
     children: React.ReactElement | JSX.Element;
     spanClassName?: string;
+    index?: number;
 };
 
 const HighlightSearchWrapper = ({
-    index,
     searchString,
     searchMinLength = 1,
     onMatchData,
     children,
     spanClassName = "highlightsearch-selected-element",
+    index = 0,
 }: PageSearchWrapperProps) => {
     const parentRef = useRef<HTMLDivElement>(null);
     const ref = useRef<HTMLDivElement>(null);
@@ -39,7 +39,11 @@ const HighlightSearchWrapper = ({
 
     const setMatchDataFn = useCallback(
         (count: number) => {
-            onMatchData?.(index, count, count ? parentRef.current : null);
+            onMatchData?.({
+                wrapperIndex: index,
+                matchesFound: count,
+                matchParentElement: count ? parentRef.current : null,
+            });
         },
         [index, onMatchData],
     );
