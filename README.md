@@ -16,6 +16,8 @@ yarn add react-highlight-search
 
 # Basic Usage in React App
 
+[Live Demo](https://oppositeart.github.io/react-highlight-search/)
+
 In the current version, all search text must be at the same nesting level. Refer to the example below.
 
 ```
