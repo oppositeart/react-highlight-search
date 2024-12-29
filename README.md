@@ -1,7 +1,7 @@
 
 # React-Highlight-Search
 
-React Highlight Search is an *out-of-the-box solution for deep text search* through the DOM tree. It provides a lightweight and fast ReactJS component *(19.2 kB, reduced to 6.8 kB gzip)*, built with Vanilla JS and featuring zero dependencies.
+React Highlight Search is an *out-of-the-box solution for deep text search* through the DOM tree. It provides a lightweight and fast ReactJS component *(19.8 kB, reduced to 6.9 kB gzip)*, built with Vanilla JS and featuring zero dependencies.
 
 # Installation
 
@@ -16,7 +16,7 @@ yarn add react-highlight-search
 
 # Basic Usage in React App
 
-[Live Demo](https://oppositeart.github.io/react-highlight-search/)
+[Live Demo](https://oppositeart.github.io/react-highlight-search/?path=/docs/example-deep-search-example--docs)
 
 Implementing deep search through a nested DOM is incredibly simple with the react-highlight-search package.
 
