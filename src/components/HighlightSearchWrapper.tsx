@@ -15,25 +15,35 @@ import "./styles.css";
 
 type PageSearchWrapperProps = {
     searchString: string;
+    setTriggerSearch?: React.Dispatch<
+        React.SetStateAction<((text: string) => void) | undefined>
+    >;
     searchMinLength?: number;
     onMatchData?: OnMatchDataType;
     children: React.ReactElement | JSX.Element;
     spanClassName?: string;
+    ignoreCase?: boolean;
     index?: number;
 };
 
+const SEARCH_MIN_LENGTH = 1;
+
 const HighlightSearchWrapper = ({
     searchString,
-    searchMinLength = 1,
+    setTriggerSearch,
+    searchMinLength = SEARCH_MIN_LENGTH,
     onMatchData,
     children,
-    spanClassName = "highlightsearch-selected-element",
+    spanClassName = "hlsearch-span-el",
+    ignoreCase = true,
     index = 0,
 }: PageSearchWrapperProps) => {
     const parentRef = useRef<HTMLDivElement>(null);
     const ref = useRef<HTMLDivElement>(null);
 
-    const [originNodes, setOriginNodes] = useState<ChangedNodeObjectType[]>();
+    const [originNodes, setOriginNodes] = useState<
+        ChangedNodeObjectType[] | undefined
+    >();
 
     const prevSearchString = usePrevious(searchString);
 
@@ -55,7 +65,11 @@ const HighlightSearchWrapper = ({
             // Restore original Node elements before each search
             restoreOriginNodes(originNodes);
 
-            if (text?.length < (searchMinLength > 0 ? searchMinLength : 1)) {
+            if (
+                text?.length <
+                (searchMinLength > 0 ? searchMinLength : SEARCH_MIN_LENGTH)
+            ) {
+                setOriginNodes(undefined);
                 return;
             }
 
@@ -85,7 +99,7 @@ const HighlightSearchWrapper = ({
                 textCombined += node.textContent;
             });
 
-            const regexp = new RegExp(text, "ig");
+            const regexp = new RegExp(text, ignoreCase ? "ig" : "g");
             const matches = textCombined.matchAll(regexp);
 
             let matchCount = 0;
@@ -112,7 +126,13 @@ const HighlightSearchWrapper = ({
             // Add spans to selected nodes
             addSpans(matchData, setOriginNodes, spanClassName);
         },
-        [originNodes, setMatchDataFn],
+        [
+            ignoreCase,
+            originNodes,
+            searchMinLength,
+            setMatchDataFn,
+            spanClassName,
+        ],
     );
 
     // Run search if user input is changed
@@ -121,6 +141,10 @@ const HighlightSearchWrapper = ({
             searchText(searchString);
         }
     }, [prevSearchString, searchString, searchText]);
+
+    useEffect(() => {
+        setTriggerSearch?.(() => (text: string) => searchText(text));
+    }, [setTriggerSearch, searchText]);
 
     return (
         <div ref={parentRef}>

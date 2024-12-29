@@ -1,7 +1,7 @@
 
 # React-Highlight-Search
 
-React Highlight Search is a lightweight and fast ReactJS component *(17.7 kB > 6.3 kB gzip)*, built with Vanilla JS and featuring 0 dependencies, designed for deep text search through the DOM tree.
+React Highlight Search is an *out-of-the-box solution for deep text search* through the DOM tree. It provides a lightweight and fast ReactJS component *(19.2 kB, reduced to 6.8 kB gzip)*, built with Vanilla JS and featuring zero dependencies.
 
 # Installation
 
@@ -18,7 +18,7 @@ yarn add react-highlight-search
 
 [Live Demo](https://oppositeart.github.io/react-highlight-search/)
 
-In the current version, all search text must be at the same nesting level. Refer to the example below.
+Implementing deep search through a nested DOM is incredibly simple with the react-highlight-search package.
 
 ```
 import React, { useState, useCallback } from "react";
@@ -45,17 +45,26 @@ const ExampleWithSearch = () => {
           onMatchData={setMatchData} // Pass the function to update search data on a successful search
         >
           <div className={"example-of-nesting-1"}>
-            <div className={"example-of-nesting-2"}>
-              <div className={"example-of-nesting-3"}>
-                <ul>
-                  // Search text must be at the same nesting level
-                  <li>Search Me!</li>
-                  <li>Search Me Again!</li>
-                  <li>Hello World!</li>
-                  <li>Other text example</li>
-                </ul>
+              Hello World!
+              <div className={"example-of-nesting-2}>
+                  Other text example
+                  <div className={"example-of-nesting-3}>
+                      Search Me!
+                      <ul>
+                          <li>Search Me..</li>
+                          <li>
+                              Search Me Again!
+                              <span>Search Me!</span>
+                          </li>
+                          <li>Hello World!</li>
+                          <li>
+                              <div>
+                                  <h4>Other text example</h4>
+                              </div>
+                          </li>
+                      </ul>
+                  </div>
               </div>
-            </div>
           </div>
         </HighlightSearchWrapper>
       </div>
@@ -83,13 +92,14 @@ export default ExampleWithSearch;
 | Name  | Required | Type | Default | Description |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 | searchString  | Yes | string | undefined | The text to search for.
+| setTriggerSearch  | No | Function | undefined | The function to trigger search manually.
 | searchMinLength  | No | number | 1 | The minimum length of text required to start the search.
 | onMatchData  | No | Function | undefined | Callback function triggered on a successful search.
-| spanClassName  | No | string | "highlightsearch-selected-element" | Class name applied to the <span> elements added to the DOM for highlighting text.
+| spanClassName  | No | string | "hlsearch-span-el" | Class name applied to the <span> elements added to the DOM for highlighting text.
 | index  | No | number | 0 | Index value returned in the onMatchData callback. Useful for managing multiple components.
 
 # License
 
-MIT Licensed. Copyright (c) Vladyslav Dotsenko 2024.
+MIT Licensed. Copyright (c) Vladyslav Dotsenko 2025.
 
 _________

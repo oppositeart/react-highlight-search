@@ -1,3 +1,4 @@
+import { env } from "process";
 import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
@@ -8,7 +9,7 @@ import postcss from "rollup-plugin-postcss";
 
 import packageJson from "./package.json";
 
-const devMode = process.env.NODE_ENV === "development";
+const devMode = env.NODE_ENV === "development";
 
 export default [
     {

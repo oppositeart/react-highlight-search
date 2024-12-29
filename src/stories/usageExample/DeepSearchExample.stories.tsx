@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import ExampleWithSearch from "./ExampleWithSearch";
 
 const meta = {
-    title: "Example/UsageExample",
+    title: "Example/Deep Search Example",
     component: ExampleWithSearch,
     parameters: {
         layout: "centered",
