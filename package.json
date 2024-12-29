@@ -1,6 +1,6 @@
 {
   "name": "react-highlight-search",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Text highlight with deep search through DOM elements.",
   "keywords": [
     "react",
