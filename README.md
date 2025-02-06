@@ -1,7 +1,7 @@
 
 # React-Highlight-Search
 
-React Highlight Search is an *out-of-the-box solution for deep text search* through the DOM tree. It provides a lightweight and fast ReactJS component *(19.8 kB, reduced to 6.9 kB gzip)*, built with Vanilla JS and featuring zero dependencies.
+React Highlight Search is an **out-of-the-box solution for deep text search** through the DOM tree. It provides a lightweight and fast ReactJS component *(19.9 kB, reduced to 7.0 kB gzip)*, built with Vanilla JS and featuring zero dependencies.
 
 # Installation
 
@@ -25,7 +25,7 @@ import React, { useState, useCallback } from "react";
 import { HighlightSearchWrapper } from "react-highlight-search";
 
 const ExampleWithSearch = () => {
-  const [searchString, setSearchString] = useState(""); // Controlled string to search for
+  const [searchString, setSearchString] = useState(""); // State variable to hold the search string
   const [matchData, setMatchData] = useState({
     wrapperIndex: 0,
     matchesFound: 0,
@@ -39,35 +39,33 @@ const ExampleWithSearch = () => {
   return (
     <>
       <input onInput={handleInputChange} />
-      <div>
-        <HighlightSearchWrapper
-          searchString={searchString} // Pass the search string
-          onMatchData={setMatchData} // Pass the function to update search data on a successful search
-        >
-          <div className={"example-of-nesting-1"}>
-              Hello World!
-              <div className={"example-of-nesting-2}>
-                  Other text example
-                  <div className={"example-of-nesting-3}>
-                      Search Me!
-                      <ul>
-                          <li>Search Me..</li>
-                          <li>
-                              Search Me Again!
-                              <span>Search Me!</span>
-                          </li>
-                          <li>Hello World!</li>
-                          <li>
-                              <div>
-                                  <h4>Other text example</h4>
-                              </div>
-                          </li>
-                      </ul>
-                  </div>
-              </div>
-          </div>
-        </HighlightSearchWrapper>
-      </div>
+      <HighlightSearchWrapper
+        searchString={searchString} // Pass the search string
+        onMatchData={setMatchData} // Pass the function to update search data on a successful search
+      >
+        <div className={"example-of-nesting-1"}>
+            Hello World!
+            <div className={"example-of-nesting-2}>
+                Other text example
+                <div className={"example-of-nesting-3}>
+                    Search Me!
+                    <ul>
+                        <li>Search Me..</li>
+                        <li>
+                            Search Me Again!
+                            <span>Search Me!</span>
+                        </li>
+                        <li>Hello World!</li>
+                        <li>
+                            <div>
+                                <h4>Other text example</h4>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+      </HighlightSearchWrapper>
 
       // Block shows example of the search result data
       <div style={{ width: "350px" }}>
@@ -93,11 +91,12 @@ export default ExampleWithSearch;
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 | searchString  | Yes | string | undefined | The text to search for.
 | setTriggerSearch  | No | Function | undefined | The function to trigger search manually.
+| ignoreCase  | No | boolean | true | Ignore case sensitive of the search string.
 | searchMinLength  | No | number | 1 | The minimum length of text required to start the search.
 | onMatchData  | No | Function | undefined | Callback function triggered on a successful search.
 | spanClassName  | No | string | "hlsearch-span-el" | Class name applied to the <span> elements added to the DOM for highlighting text.
 | index  | No | number | 0 | Index value returned in the onMatchData callback. Useful for managing multiple components.
-
+// TODO: issues with dots
 # License
 
 MIT Licensed. Copyright (c) Vladyslav Dotsenko 2025.

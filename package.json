@@ -1,6 +1,6 @@
 {
   "name": "react-highlight-search",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Text highlight with deep search through DOM elements.",
   "keywords": [
     "react",
@@ -59,15 +59,13 @@
     "rollup-plugin-postcss": "^4.0.2",
     "storybook": "^8.2.8",
     "typescript": "^5.5.4",
-    "typescript-eslint": "^8.18.2"
+    "typescript-eslint": "^8.18.2",
+    "react-code-blocks": "^0.1.6"
   },
   "peerDependencies": {
     "react": ">=16.14.0"
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "dependencies": {
-    "react-code-blocks": "^0.1.6"
   }
 }
