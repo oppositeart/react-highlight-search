@@ -1,8 +1,7 @@
-import React, { useState, useCallback, useEffect, memo } from "react";
+import React, { useState, useCallback, memo } from "react";
 import { CopyBlock, dracula } from "react-code-blocks";
 
 import { HighlightSearchWrapper } from "../../components";
-import { usePrevious } from "../../hooks";
 import { OnMatchDataPropsType } from "../../types";
 
 import "./styles.css";
@@ -38,8 +37,6 @@ const ExampleWithSearch = () => {
     const defaultValue = "Search Me";
 
     const [searchString, setSearchString] = useState<string>(defaultValue);
-    const [triggerSearch, setTriggerSearch] =
-        useState<(text: string) => void>();
     const [matchData, setMatchData] = useState<OnMatchDataPropsType>({
         wrapperIndex: 0,
         matchesFound: 0,
@@ -47,14 +44,6 @@ const ExampleWithSearch = () => {
     });
 
     const [showHtml, setShowHtml] = useState<boolean>(false);
-
-    const prevShowHtml = usePrevious(showHtml);
-
-    useEffect(() => {
-        if (prevShowHtml !== showHtml) {
-            triggerSearch?.(searchString);
-        }
-    }, [showHtml, searchString, triggerSearch, prevShowHtml]);
 
     const handleInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +98,6 @@ const ExampleWithSearch = () => {
                 </div>
                 <HighlightSearchWrapper
                     searchString={searchString}
-                    setTriggerSearch={setTriggerSearch}
                     onMatchData={setMatchData}
                 >
                     {showHtml ? (

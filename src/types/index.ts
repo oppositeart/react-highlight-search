@@ -20,7 +20,7 @@ export type MatchDataControllerType = ({
 export type ChangedNodeObjectType = {
     newNodes: ChildNode[];
     oldNode: ChildNode;
-    parentNode: ParentNode | null;
+    originText: string;
 };
 
 export type OnMatchDataPropsType = {

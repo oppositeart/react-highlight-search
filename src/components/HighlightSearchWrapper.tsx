@@ -1,11 +1,10 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
-
-import { usePrevious } from "../hooks";
+import React, { memo, useCallback, useEffect, useRef } from "react";
 
 import { ChangedNodeObjectType, OnMatchDataType } from "../types";
 
 import {
     addSpans,
+    escapeRegExp,
     initMatchData,
     restoreOriginNodes,
     searchAcrossNodes,
@@ -41,35 +40,61 @@ const HighlightSearchWrapper = ({
     const parentRef = useRef<HTMLDivElement>(null);
     const ref = useRef<HTMLDivElement>(null);
 
-    const [originNodes, setOriginNodes] = useState<
-        ChangedNodeObjectType[] | undefined
-    >();
+    // Kept in a ref so back-to-back searches always restore the latest nodes
+    const originNodesRef = useRef<ChangedNodeObjectType[] | undefined>(undefined);
 
-    const prevSearchString = usePrevious(searchString);
+    const setOriginNodes = useCallback(
+        (changedNodesObject: ChangedNodeObjectType[] | undefined) => {
+            originNodesRef.current = changedNodesObject;
+        },
+        [],
+    );
+
+    // Latest callback in a ref, so an inline onMatchData doesn't re-run the search
+    const onMatchDataRef = useRef(onMatchData);
+    onMatchDataRef.current = onMatchData;
+
+    // Watches the wrapped DOM so highlights follow changes made by React
+    const observerRef = useRef<MutationObserver | undefined>(undefined);
+    const observedRecordsRef = useRef<MutationRecord[]>([]);
+    const lastSearchRef = useRef<string | undefined>(undefined);
 
     const setMatchDataFn = useCallback(
         (count: number) => {
-            onMatchData?.({
+            onMatchDataRef.current?.({
                 wrapperIndex: index,
                 matchesFound: count,
                 matchParentElement: count ? parentRef.current : null,
             });
         },
-        [index, onMatchData],
+        [index],
     );
 
-    const searchText = useCallback(
+    const highlightText = useCallback(
         (text: string) => {
             setMatchDataFn(0);
 
+            // Text nodes React has rewritten since the last search
+            const records = [
+                ...observedRecordsRef.current,
+                ...(observerRef.current?.takeRecords() || []),
+            ];
+            observedRecordsRef.current = [];
+
+            const externallyChangedNodes = new Set<Node>(
+                records
+                    .filter(({ type }) => type === "characterData")
+                    .map(({ target }) => target),
+            );
+
             // Restore original Node elements before each search
-            restoreOriginNodes(originNodes);
+            restoreOriginNodes(originNodesRef.current, externallyChangedNodes);
+            setOriginNodes(undefined);
 
             if (
                 text?.length <
                 (searchMinLength > 0 ? searchMinLength : SEARCH_MIN_LENGTH)
             ) {
-                setOriginNodes(undefined);
                 return;
             }
 
@@ -99,7 +124,11 @@ const HighlightSearchWrapper = ({
                 textCombined += node.textContent;
             });
 
-            const regexp = new RegExp(text, ignoreCase ? "ig" : "g");
+            // Match the search string literally ("." or "(" are plain characters)
+            const regexp = new RegExp(
+                escapeRegExp(text),
+                ignoreCase ? "ig" : "g",
+            );
             const matches = textCombined.matchAll(regexp);
 
             let matchCount = 0;
@@ -128,19 +157,61 @@ const HighlightSearchWrapper = ({
         },
         [
             ignoreCase,
-            originNodes,
             searchMinLength,
             setMatchDataFn,
+            setOriginNodes,
             spanClassName,
         ],
     );
 
-    // Run search if user input is changed
+    const searchText = useCallback(
+        (text: string) => {
+            lastSearchRef.current = text;
+            highlightText(text);
+            // Ignore DOM changes made by the search itself
+            observerRef.current?.takeRecords();
+        },
+        [highlightText],
+    );
+
+    const searchTextRef = useRef(searchText);
+    searchTextRef.current = searchText;
+
+    // Run search if user input or search options are changed
     useEffect(() => {
-        if (searchString !== undefined && searchString !== prevSearchString) {
+        if (searchString !== undefined) {
             searchText(searchString);
         }
-    }, [prevSearchString, searchString, searchText]);
+    }, [searchString, searchText]);
+
+    // Re-run the last search when the wrapped content changes
+    useEffect(() => {
+        const container = ref.current;
+
+        if (!container || typeof MutationObserver === "undefined") {
+            return;
+        }
+
+        const observer = new MutationObserver(records => {
+            if (!lastSearchRef.current && !originNodesRef.current) {
+                return;
+            }
+            observedRecordsRef.current.push(...records);
+            searchTextRef.current(lastSearchRef.current || "");
+        });
+
+        observer.observe(container, {
+            childList: true,
+            characterData: true,
+            subtree: true,
+        });
+        observerRef.current = observer;
+
+        return () => {
+            observer.disconnect();
+            observerRef.current = undefined;
+        };
+    }, []);
 
     useEffect(() => {
         setTriggerSearch?.(() => (text: string) => searchText(text));
