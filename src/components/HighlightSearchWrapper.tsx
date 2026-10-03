@@ -41,7 +41,6 @@ const HighlightSearchWrapper = ({
     ignoreCase = true,
     index = 0,
 }: PageSearchWrapperProps) => {
-    const parentRef = useRef<HTMLDivElement>(null);
     const ref = useRef<HTMLDivElement>(null);
 
     // Kept in a ref so back-to-back searches always restore the latest nodes
@@ -64,11 +63,11 @@ const HighlightSearchWrapper = ({
     const lastSearchRef = useRef<SearchStringType | undefined>(undefined);
 
     const setMatchDataFn = useCallback(
-        (count: number) => {
+        (count: number, spanElements: HTMLSpanElement[] = []) => {
             onMatchDataRef.current?.({
                 wrapperIndex: index,
                 matchesFound: count,
-                matchParentElement: count ? parentRef.current : null,
+                spanElements: count ? spanElements : null,
             });
         },
         [index],
@@ -161,10 +160,14 @@ const HighlightSearchWrapper = ({
                     matchDataController,
                 );
             }
-            setMatchDataFn(matchCount);
-
             // Add spans to selected nodes
-            addSpans(matchData, setOriginNodes, spanClassName);
+            const spanElements = addSpans(
+                matchData,
+                setOriginNodes,
+                spanClassName,
+            );
+
+            setMatchDataFn(matchCount, spanElements);
         },
         [
             ignoreCase,
@@ -234,7 +237,7 @@ const HighlightSearchWrapper = ({
     }, [setTriggerSearch, searchText]);
 
     return (
-        <div ref={parentRef}>
+        <div>
             <div ref={ref}>{children}</div>
         </div>
     );

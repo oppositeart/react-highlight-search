@@ -40,7 +40,7 @@ const ExampleWithSearch = () => {
     const [matchData, setMatchData] = useState<OnMatchDataPropsType>({
         wrapperIndex: 0,
         matchesFound: 0,
-        matchParentElement: null,
+        spanElements: null,
     });
 
     const [showHtml, setShowHtml] = useState<boolean>(false);
@@ -257,10 +257,8 @@ const ExampleWithSearch = () => {
                         <div>Wrapper Index: {matchData.wrapperIndex}</div>
                         <div>Matches Found: {matchData.matchesFound}</div>
                         <div>
-                            Match Parent Element:
-                            {matchData.matchParentElement
-                                ? matchData.matchParentElement.toString()
-                                : ""}
+                            Span Elements:{" "}
+                            {matchData.spanElements?.length ?? "null"}
                         </div>
                     </div>
                 </div>

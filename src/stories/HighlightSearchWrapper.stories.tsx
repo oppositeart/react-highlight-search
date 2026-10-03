@@ -19,7 +19,7 @@ export const Primary: Story = {
     args: {
         index: 0,
         searchString: "Hello",
-        // onMatchData: ({wrapperIndex, matchesFound, matchParentElement}) => {},
+        // onMatchData: ({wrapperIndex, matchesFound, spanElements}) => {},
         children: <div>Hello World!</div>,
     },
 };

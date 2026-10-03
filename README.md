@@ -29,7 +29,7 @@ const ExampleWithSearch = () => {
   const [matchData, setMatchData] = useState({
     wrapperIndex: 0,
     matchesFound: 0,
-    matchParentElement: null,
+    spanElements: null,
   }); // Search data returned by the component
 
   const handleInputChange = useCallback((e) => {
@@ -72,10 +72,7 @@ const ExampleWithSearch = () => {
         <div>Wrapper Index: {matchData.wrapperIndex}</div>
         <div>Matches Found: {matchData.matchesFound}</div>
         <div>
-          Match Parent Element:
-          {matchData.matchParentElement
-            ? matchData.matchParentElement.toString()
-            : ""}
+          Span Elements: {matchData.spanElements?.length ?? "null"}
         </div>
       </div>
     </>
@@ -93,7 +90,7 @@ export default ExampleWithSearch;
 | setTriggerSearch  | No | Function | undefined | The function to trigger search manually.
 | ignoreCase  | No | boolean | true | Ignore case sensitive of the search string.
 | searchMinLength  | No | number | 1 | The minimum length of text required to start the search.
-| onMatchData  | No | Function | undefined | Callback function triggered on a successful search.
+| onMatchData  | No | Function | undefined | Callback function triggered on a successful search. Receives `{ wrapperIndex, matchesFound, spanElements }`, where `spanElements` is the array of added highlight `<span>` elements in document order (or `null` when nothing matched). Use it to scroll to a match or reach the spans' parent elements. A match that spans several text nodes produces several spans.
 | spanClassName  | No | string | "hlsearch-span-el" | Class name applied to the <span> elements added to the DOM for highlighting text.
 | index  | No | number | 0 | Index value returned in the onMatchData callback. Useful for managing multiple components.
 // TODO: issues with dots

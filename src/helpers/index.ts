@@ -54,12 +54,14 @@ export const initMatchData = () => {
 // Add spans to dom according to node match object.
 // The original text node stays in place holding the text after the last match,
 // so React can still update, move or remove the node it rendered.
+// Returns the added spans in document order.
 export const addSpans = (
     matchDataArr: MatchNodeCombinedDataType[],
     setOriginNodes: (changedNodesObject: ChangedNodeObjectType[]) => void,
     spanClassName?: string,
 ) => {
     const changedNodesObject: ChangedNodeObjectType[] = [];
+    const spanElements: HTMLSpanElement[] = [];
 
     matchDataArr.forEach(({ node, positionsArr }) => {
         const parentNode = node.parentNode;
@@ -88,6 +90,7 @@ export const addSpans = (
                 document.createTextNode(originText.slice(startPos, endPos)),
             );
             addedNodes.push(spanNode as ChildNode);
+            spanElements.push(spanNode);
             parentNode?.insertBefore(spanNode, node);
 
             lastPos = endPos;
@@ -103,6 +106,8 @@ export const addSpans = (
     });
 
     setOriginNodes(changedNodesObject);
+
+    return spanElements;
 };
 
 // Escape RegExp special characters so the search string is matched literally

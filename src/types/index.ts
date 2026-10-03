@@ -28,7 +28,8 @@ export type ChangedNodeObjectType = {
 export type OnMatchDataPropsType = {
     wrapperIndex: number;
     matchesFound: number;
-    matchParentElement: HTMLDivElement | null;
+    // Highlight spans added to the DOM, or null when nothing matched
+    spanElements: HTMLSpanElement[] | null;
 };
 
 export type OnMatchDataType = (matchData: OnMatchDataPropsType) => void;
