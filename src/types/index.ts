@@ -1,3 +1,5 @@
+export type SearchStringType = string | string[];
+
 export type MatchNodeDataType = {
     index: number;
     node: ChildNode;

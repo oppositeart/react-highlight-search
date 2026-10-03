@@ -89,7 +89,7 @@ export default ExampleWithSearch;
 
 | Name  | Required | Type | Default | Description |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
-| searchString  | Yes | string | undefined | The text to search for.
+| searchString  | Yes | string \| string[] | undefined | The text to search for. Pass an array to highlight several terms at once, e.g. `["str1", "str2"]`; `matchesFound` is the total for all terms.
 | setTriggerSearch  | No | Function | undefined | The function to trigger search manually.
 | ignoreCase  | No | boolean | true | Ignore case sensitive of the search string.
 | searchMinLength  | No | number | 1 | The minimum length of text required to start the search.
