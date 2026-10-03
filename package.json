@@ -4,11 +4,20 @@
     "description": "Text highlight with deep search through DOM elements.",
     "keywords": [
         "react",
-        "text",
         "highlight",
         "search",
+        "text",
+        "dom",
         "deep",
-        "dom"
+        "text-highlight",
+        "search-highlight",
+        "highlighter",
+        "mark",
+        "find",
+        "find-in-page",
+        "multi-term",
+        "typescript",
+        "react-component"
     ],
     "author": "Vladyslav Dotsenko",
     "license": "MIT",
