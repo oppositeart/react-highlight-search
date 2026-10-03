@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo } from "react";
+import React, { useState, useCallback, useMemo, memo } from "react";
 import { CopyBlock, dracula } from "react-code-blocks";
 
 import { HighlightSearchWrapper } from "../../components";
@@ -13,22 +13,30 @@ import {
 
 import "./styles.css";
 
-const ExampleWithSearch = () => {
-    const defaultValue = "Search Me";
+// Split comma-separated input into trimmed, non-empty terms
+const parseTerms = (value: string) =>
+    value
+        .split(",")
+        .map(term => term.trim())
+        .filter(Boolean);
 
-    const [searchString, setSearchString] = useState<string>(defaultValue);
+const MultiTermSearchExample = () => {
+    const defaultValue = "Search, World, example";
+
+    const [inputValue, setInputValue] = useState<string>(defaultValue);
     const [ignoreCase, setIgnoreCase] = useState<boolean>(true);
+    const [showHtml, setShowHtml] = useState<boolean>(false);
     const [matchData, setMatchData] = useState<OnMatchDataPropsType>({
         wrapperIndex: 0,
         matchesFound: 0,
         spanElements: null,
     });
 
-    const [showHtml, setShowHtml] = useState<boolean>(false);
+    const terms = useMemo(() => parseTerms(inputValue), [inputValue]);
 
     const handleInputChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            setSearchString(e.target.value);
+            setInputValue(e.target.value);
         },
         [],
     );
@@ -36,33 +44,32 @@ const ExampleWithSearch = () => {
     return (
         <>
             <div className="main-wrapper">
-                <h3>Check it out!</h3>
+                <h3>Multi-term search</h3>
                 <p>
-                    Implementing deep search through a nested DOM is incredibly
-                    simple with the react-highlight-search package.
+                    Pass an array of strings to highlight several terms at once.
                 </p>
                 <div>
                     <p>
-                        To check the search functionality, type in the input
-                        field below.
+                        Type terms separated by commas in the input field below.
+                        Each term is highlighted on its own.
                     </p>
                 </div>
                 <div className="controls">
                     <div>
                         <input
-                            value={searchString}
+                            value={inputValue}
                             className="search-input"
-                            aria-label="Search text"
+                            aria-label="Search terms, separated by commas"
                             onChange={handleInputChange}
                         />
                     </div>
                     <div className="control-box">
                         <div className="header">Options</div>
                         <div>
-                            <label htmlFor="ignoreCase">Ignore case</label>
+                            <label htmlFor="ignoreCaseMulti">Ignore case</label>
                             <input
                                 type="checkbox"
-                                id="ignoreCase"
+                                id="ignoreCaseMulti"
                                 checked={ignoreCase}
                                 onChange={e => setIgnoreCase(e.target.checked)}
                             />
@@ -70,13 +77,13 @@ const ExampleWithSearch = () => {
                     </div>
                 </div>
                 <HtmlPreviewToggle
-                    idPrefix="deepSearch"
+                    idPrefix="multiTerm"
                     showHtml={showHtml}
                     setShowHtml={setShowHtml}
                 />
                 <MatchNavigator spanElements={matchData.spanElements} />
                 <HighlightSearchWrapper
-                    searchString={searchString}
+                    searchString={terms}
                     ignoreCase={ignoreCase}
                     onMatchData={setMatchData}
                 >
@@ -85,13 +92,14 @@ const ExampleWithSearch = () => {
                 <div className="returned-data">
                     <div className="header">Returned Data</div>
                     <div>
+                        <div>Search Terms: {JSON.stringify(terms)}</div>
                         <div>Wrapper Index: {matchData.wrapperIndex}</div>
                         <div>Matches Found: {matchData.matchesFound}</div>
                         <div>
                             Span Elements:{" "}
                             {matchData.spanElements?.length ?? "null"}
                         </div>
-                        {searchString && !matchData.matchesFound && (
+                        {terms.length > 0 && !matchData.matchesFound && (
                             <div className="no-matches">No matches</div>
                         )}
                     </div>
@@ -100,7 +108,7 @@ const ExampleWithSearch = () => {
             <div className="code-block">
                 <CopyBlock
                     language={"jsx"}
-                    text={buildCodeSnippet(searchString, ignoreCase)}
+                    text={buildCodeSnippet(terms, ignoreCase)}
                     showLineNumbers={true}
                     theme={dracula}
                     codeBlock
@@ -110,4 +118,4 @@ const ExampleWithSearch = () => {
     );
 };
 
-export default memo(ExampleWithSearch);
+export default memo(MultiTermSearchExample);

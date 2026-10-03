@@ -1,11 +1,14 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useRef } from "react";
 
-import { usePrevious } from "../hooks";
-
-import { ChangedNodeObjectType, OnMatchDataType } from "../types";
+import {
+    ChangedNodeObjectType,
+    OnMatchDataType,
+    SearchStringType,
+} from "../types";
 
 import {
     addSpans,
+    escapeRegExp,
     initMatchData,
     restoreOriginNodes,
     searchAcrossNodes,
@@ -14,9 +17,9 @@ import {
 import "./styles.css";
 
 type PageSearchWrapperProps = {
-    searchString: string;
+    searchString: SearchStringType;
     setTriggerSearch?: React.Dispatch<
-        React.SetStateAction<((text: string) => void) | undefined>
+        React.SetStateAction<((text: SearchStringType) => void) | undefined>
     >;
     searchMinLength?: number;
     onMatchData?: OnMatchDataType;
@@ -38,38 +41,68 @@ const HighlightSearchWrapper = ({
     ignoreCase = true,
     index = 0,
 }: PageSearchWrapperProps) => {
-    const parentRef = useRef<HTMLDivElement>(null);
     const ref = useRef<HTMLDivElement>(null);
 
-    const [originNodes, setOriginNodes] = useState<
-        ChangedNodeObjectType[] | undefined
-    >();
+    // Kept in a ref so back-to-back searches always restore the latest nodes
+    const originNodesRef = useRef<ChangedNodeObjectType[] | undefined>(undefined);
 
-    const prevSearchString = usePrevious(searchString);
-
-    const setMatchDataFn = useCallback(
-        (count: number) => {
-            onMatchData?.({
-                wrapperIndex: index,
-                matchesFound: count,
-                matchParentElement: count ? parentRef.current : null,
-            });
+    const setOriginNodes = useCallback(
+        (changedNodesObject: ChangedNodeObjectType[] | undefined) => {
+            originNodesRef.current = changedNodesObject;
         },
-        [index, onMatchData],
+        [],
     );
 
-    const searchText = useCallback(
-        (text: string) => {
+    // Latest callback in a ref, so an inline onMatchData doesn't re-run the search
+    const onMatchDataRef = useRef(onMatchData);
+    onMatchDataRef.current = onMatchData;
+
+    // Watches the wrapped DOM so highlights follow changes made by React
+    const observerRef = useRef<MutationObserver | undefined>(undefined);
+    const observedRecordsRef = useRef<MutationRecord[]>([]);
+    const lastSearchRef = useRef<SearchStringType | undefined>(undefined);
+
+    const setMatchDataFn = useCallback(
+        (count: number, spanElements: HTMLSpanElement[] = []) => {
+            onMatchDataRef.current?.({
+                wrapperIndex: index,
+                matchesFound: count,
+                spanElements: count ? spanElements : null,
+            });
+        },
+        [index],
+    );
+
+    const highlightText = useCallback(
+        (text: SearchStringType) => {
             setMatchDataFn(0);
 
-            // Restore original Node elements before each search
-            restoreOriginNodes(originNodes);
+            // Text nodes React has rewritten since the last search
+            const records = [
+                ...observedRecordsRef.current,
+                ...(observerRef.current?.takeRecords() || []),
+            ];
+            observedRecordsRef.current = [];
 
-            if (
-                text?.length <
-                (searchMinLength > 0 ? searchMinLength : SEARCH_MIN_LENGTH)
-            ) {
-                setOriginNodes(undefined);
+            const externallyChangedNodes = new Set<Node>(
+                records
+                    .filter(({ type }) => type === "characterData")
+                    .map(({ target }) => target),
+            );
+
+            // Restore original Node elements before each search
+            restoreOriginNodes(originNodesRef.current, externallyChangedNodes);
+            setOriginNodes(undefined);
+
+            const minLength =
+                searchMinLength > 0 ? searchMinLength : SEARCH_MIN_LENGTH;
+
+            // Accept one term or several, skipping terms that are too short
+            const terms = (Array.isArray(text) ? text : [text]).filter(
+                term => typeof term === "string" && term.length >= minLength,
+            );
+
+            if (!terms.length) {
                 return;
             }
 
@@ -99,7 +132,13 @@ const HighlightSearchWrapper = ({
                 textCombined += node.textContent;
             });
 
-            const regexp = new RegExp(text, ignoreCase ? "ig" : "g");
+            // Match the terms literally ("." or "(" are plain characters).
+            // Longer terms go first, so "cats" wins over "cat" at the same spot.
+            const pattern = Array.from(new Set(terms))
+                .sort((a, b) => b.length - a.length)
+                .map(escapeRegExp)
+                .join("|");
+            const regexp = new RegExp(pattern, ignoreCase ? "ig" : "g");
             const matches = textCombined.matchAll(regexp);
 
             let matchCount = 0;
@@ -121,33 +160,84 @@ const HighlightSearchWrapper = ({
                     matchDataController,
                 );
             }
-            setMatchDataFn(matchCount);
-
             // Add spans to selected nodes
-            addSpans(matchData, setOriginNodes, spanClassName);
+            const spanElements = addSpans(
+                matchData,
+                setOriginNodes,
+                spanClassName,
+            );
+
+            setMatchDataFn(matchCount, spanElements);
         },
         [
             ignoreCase,
-            originNodes,
             searchMinLength,
             setMatchDataFn,
+            setOriginNodes,
             spanClassName,
         ],
     );
 
-    // Run search if user input is changed
+    const searchText = useCallback(
+        (text: SearchStringType) => {
+            lastSearchRef.current = text;
+            highlightText(text);
+            // Ignore DOM changes made by the search itself
+            observerRef.current?.takeRecords();
+        },
+        [highlightText],
+    );
+
+    const searchTextRef = useRef(searchText);
+    searchTextRef.current = searchText;
+
+    // Compare terms by value, so a new array with the same terms
+    // on every render doesn't re-run the search
+    const searchKey =
+        searchString === undefined ? undefined : JSON.stringify(searchString);
+
+    // Run search if user input or search options are changed
     useEffect(() => {
-        if (searchString !== undefined && searchString !== prevSearchString) {
-            searchText(searchString);
+        if (searchKey !== undefined) {
+            searchText(JSON.parse(searchKey));
         }
-    }, [prevSearchString, searchString, searchText]);
+    }, [searchKey, searchText]);
+
+    // Re-run the last search when the wrapped content changes
+    useEffect(() => {
+        const container = ref.current;
+
+        if (!container || typeof MutationObserver === "undefined") {
+            return;
+        }
+
+        const observer = new MutationObserver(records => {
+            if (!lastSearchRef.current?.length && !originNodesRef.current) {
+                return;
+            }
+            observedRecordsRef.current.push(...records);
+            searchTextRef.current(lastSearchRef.current || "");
+        });
+
+        observer.observe(container, {
+            childList: true,
+            characterData: true,
+            subtree: true,
+        });
+        observerRef.current = observer;
+
+        return () => {
+            observer.disconnect();
+            observerRef.current = undefined;
+        };
+    }, []);
 
     useEffect(() => {
-        setTriggerSearch?.(() => (text: string) => searchText(text));
+        setTriggerSearch?.(() => (text: SearchStringType) => searchText(text));
     }, [setTriggerSearch, searchText]);
 
     return (
-        <div ref={parentRef}>
+        <div>
             <div ref={ref}>{children}</div>
         </div>
     );

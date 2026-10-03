@@ -5,20 +5,23 @@ import {
     MatchNodeDataType,
 } from "../types";
 
-// Restores original nodes instead of modified ones
+// Restores original text instead of highlighted parts
 export const restoreOriginNodes = (
     changedNodesObject: ChangedNodeObjectType[] | undefined,
+    externallyChangedNodes?: Set<Node>,
 ) => {
     if (changedNodesObject === undefined) {
         return;
     }
 
-    changedNodesObject.forEach(({ newNodes, oldNode, parentNode }) => {
-        const nextSibling = newNodes[newNodes.length - 1].nextSibling || null;
-        parentNode?.insertBefore(oldNode, nextSibling);
+    changedNodesObject.forEach(({ newNodes, oldNode, originText }) => {
         newNodes.forEach(node => {
             node.remove();
         });
+        // Text React has written since highlighting is newer, so keep it
+        if (!externallyChangedNodes?.has(oldNode)) {
+            oldNode.textContent = originText;
+        }
     });
 };
 
@@ -48,66 +51,68 @@ export const initMatchData = () => {
     return { matchData, matchDataController };
 };
 
-// Add spans to dom according to node match object
+// Add spans to dom according to node match object.
+// The original text node stays in place holding the text after the last match,
+// so React can still update, move or remove the node it rendered.
+// Returns the added spans in document order.
 export const addSpans = (
     matchDataArr: MatchNodeCombinedDataType[],
     setOriginNodes: (changedNodesObject: ChangedNodeObjectType[]) => void,
     spanClassName?: string,
 ) => {
     const changedNodesObject: ChangedNodeObjectType[] = [];
+    const spanElements: HTMLSpanElement[] = [];
 
     matchDataArr.forEach(({ node, positionsArr }) => {
         const parentNode = node.parentNode;
-        const nextSibling = node.nextSibling || null;
-        const originText = node.textContent;
-
-        const textParts: string[] = [];
+        const originText = node.textContent || "";
 
         const addedNodes: ChildNode[] = [];
 
-        positionsArr.forEach(({ startPos, endPos }, i) => {
-            if (startPos !== endPos) {
-                if (i < 1) {
-                    textParts.push(originText?.slice(0, startPos) || "");
-                }
-                textParts.push(originText?.slice(startPos, endPos) || "");
-                textParts.push(
-                    originText?.slice(
-                        endPos,
-                        positionsArr[i + 1]?.startPos || originText.length,
-                    ) || "",
-                );
+        let lastPos = 0;
+
+        positionsArr.forEach(({ startPos, endPos }) => {
+            if (startPos === endPos) {
+                return;
             }
+
+            const textBefore = originText.slice(lastPos, startPos);
+
+            if (textBefore) {
+                const textNode = document.createTextNode(textBefore);
+                addedNodes.push(textNode);
+                parentNode?.insertBefore(textNode, node);
+            }
+
+            const spanNode = document.createElement("span");
+            spanClassName && spanNode.classList.add(spanClassName);
+            spanNode.appendChild(
+                document.createTextNode(originText.slice(startPos, endPos)),
+            );
+            addedNodes.push(spanNode as ChildNode);
+            spanElements.push(spanNode);
+            parentNode?.insertBefore(spanNode, node);
+
+            lastPos = endPos;
         });
 
-        node.remove();
-
-        textParts.forEach((text, i) => {
-            if (text) {
-                let textNode = document.createTextNode(text);
-
-                if (i % 2 !== 0) {
-                    const spanNode = document.createElement("span");
-                    spanClassName && spanNode.classList.add(spanClassName);
-                    spanNode.appendChild(textNode);
-                    addedNodes.push(spanNode as ChildNode);
-                    parentNode?.insertBefore(spanNode, nextSibling);
-                } else {
-                    addedNodes.push(textNode as ChildNode);
-                    parentNode?.insertBefore(textNode, nextSibling);
-                }
-            }
-        });
+        node.textContent = originText.slice(lastPos);
 
         changedNodesObject.push({
             newNodes: addedNodes,
             oldNode: node,
-            parentNode: parentNode,
+            originText,
         });
     });
 
     setOriginNodes(changedNodesObject);
+
+    return spanElements;
 };
+
+// Escape RegExp special characters so the search string is matched literally
+export const escapeRegExp = (text: string) =>
+    text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // Detect nodes that contain given positions to create node map
 export const searchAcrossNodes = (
@@ -116,47 +121,30 @@ export const searchAcrossNodes = (
     endPosition: number,
     matchDataController: MatchDataControllerType,
 ) => {
-    let searchBeginIndex = 0;
-    let searchEndIndex = 0;
-
-    let nodeBeginIndex = -1;
-    let nodeEndIndex = -1;
-
-    let relativeStartPosition = 0;
-    let relativeEndPosition = 0;
+    let nodeStart = 0;
 
     for (let i = 0; i < textNodes.length; i++) {
-        searchEndIndex =
-            searchBeginIndex + (textNodes[i]?.textContent?.length || 1) - 1;
+        const nodeLength = textNodes[i]?.textContent?.length || 0;
+        const nodeEnd = nodeStart + nodeLength;
 
+        // Mark every non-empty node the match overlaps, including middle ones
         if (
-            startPosition >= searchBeginIndex &&
-            startPosition <= searchEndIndex
+            nodeLength &&
+            startPosition < nodeEnd &&
+            endPosition >= nodeStart
         ) {
-            nodeBeginIndex = i;
-            relativeStartPosition = startPosition - searchBeginIndex;
-        }
-        if (endPosition >= searchBeginIndex && endPosition <= searchEndIndex) {
-            nodeEndIndex = i;
-            relativeEndPosition = endPosition - searchBeginIndex + 1;
-        }
-
-        if (nodeBeginIndex === i || nodeEndIndex === i) {
             matchDataController({
                 index: i,
                 node: textNodes[i],
-                startPos: nodeBeginIndex === i ? relativeStartPosition : 0,
-                endPos:
-                    nodeEndIndex === i
-                        ? relativeEndPosition
-                        : searchEndIndex + 1,
+                startPos: Math.max(startPosition - nodeStart, 0),
+                endPos: Math.min(endPosition - nodeStart + 1, nodeLength),
             });
         }
 
-        searchBeginIndex = searchEndIndex + 1;
-
-        if (nodeEndIndex > -1) {
+        if (endPosition < nodeEnd) {
             break;
         }
+
+        nodeStart = nodeEnd;
     }
 };

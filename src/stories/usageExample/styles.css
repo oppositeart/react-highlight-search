@@ -69,21 +69,21 @@ ul {
     border-radius: 3px;
 }
 
-.control-show-html {
+.control-box {
     position: relative;
     margin-left: 30px;
     padding: 15px;
     border: 1px solid #888;
     border-radius: 3px;
 }
-.control-show-html .header {
+.control-box .header {
     padding: 5px;
     position: absolute;
     top: -15px;
     left: 10px;
     background-color: #fff;
 }
-.control-show-html input {
+.control-box input {
     margin: 2px 8px;
 }
 
@@ -99,8 +99,62 @@ ul {
     padding: 5px;
     position: absolute;
     top: -15px;
-    left: 145px;
+    left: 50%;
+    transform: translateX(-50%);
     background-color: #fff;
+}
+
+.no-matches {
+    margin-top: 10px;
+    color: rgb(190, 40, 40);
+}
+
+.example-section-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+.example-section-note {
+    margin: 4px 0 10px;
+    font-size: 14px;
+    color: #555;
+}
+.example-section-note code {
+    padding: 1px 4px;
+    border-radius: 3px;
+    background-color: #eee;
+}
+
+.html-preview-toggle {
+    margin-bottom: 20px;
+}
+.html-preview-toggle input {
+    margin: 2px 8px;
+}
+
+.match-navigator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.match-navigator button {
+    padding: 5px 12px;
+    border: 1px solid #888;
+    border-radius: 3px;
+    background-color: #fff;
+    cursor: pointer;
+}
+.match-navigator button:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+.match-position {
+    min-width: 60px;
+    text-align: center;
+}
+
+.hlsearch-span-el.active-match {
+    background-color: rgb(255, 170, 0);
 }
 
 .code-block {

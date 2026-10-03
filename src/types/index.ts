@@ -1,3 +1,5 @@
+export type SearchStringType = string | string[];
+
 export type MatchNodeDataType = {
     index: number;
     node: ChildNode;
@@ -20,13 +22,14 @@ export type MatchDataControllerType = ({
 export type ChangedNodeObjectType = {
     newNodes: ChildNode[];
     oldNode: ChildNode;
-    parentNode: ParentNode | null;
+    originText: string;
 };
 
 export type OnMatchDataPropsType = {
     wrapperIndex: number;
     matchesFound: number;
-    matchParentElement: HTMLDivElement | null;
+    // Highlight spans added to the DOM, or null when nothing matched
+    spanElements: HTMLSpanElement[] | null;
 };
 
 export type OnMatchDataType = (matchData: OnMatchDataPropsType) => void;
