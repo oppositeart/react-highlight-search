@@ -109,6 +109,28 @@ ul {
     color: rgb(190, 40, 40);
 }
 
+.example-section-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+.example-section-note {
+    margin: 4px 0 10px;
+    font-size: 14px;
+    color: #555;
+}
+.example-section-note code {
+    padding: 1px 4px;
+    border-radius: 3px;
+    background-color: #eee;
+}
+
+.html-preview-toggle {
+    margin-bottom: 20px;
+}
+.html-preview-toggle input {
+    margin: 2px 8px;
+}
+
 .match-navigator {
     display: flex;
     align-items: center;

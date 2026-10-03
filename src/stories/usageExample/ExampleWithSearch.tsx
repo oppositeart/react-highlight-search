@@ -5,6 +5,7 @@ import { HighlightSearchWrapper } from "../../components";
 import { OnMatchDataPropsType } from "../../types";
 
 import {
+    HtmlPreviewToggle,
     MatchNavigator,
     SampleContent,
     buildCodeSnippet,
@@ -45,7 +46,6 @@ const ExampleWithSearch = () => {
                         To check the search functionality, type in the input
                         field below.
                     </p>
-                    <p>Use the radio buttons to toggle the HTML preview.</p>
                 </div>
                 <div className="controls">
                     <div>
@@ -55,27 +55,6 @@ const ExampleWithSearch = () => {
                             aria-label="Search text"
                             onChange={handleInputChange}
                         />
-                    </div>
-                    <div className="control-box">
-                        <div className="header">HTML Preview</div>
-                        <div>
-                            <label htmlFor="showHtml">Yes</label>
-                            <input
-                                type="radio"
-                                id="showHtml"
-                                name="displayOption"
-                                checked={showHtml}
-                                onChange={() => setShowHtml(true)}
-                            />
-                            <label htmlFor="hideHtml">No</label>
-                            <input
-                                type="radio"
-                                id="hideHtml"
-                                name="displayOption"
-                                checked={!showHtml}
-                                onChange={() => setShowHtml(false)}
-                            />
-                        </div>
                     </div>
                     <div className="control-box">
                         <div className="header">Options</div>
@@ -90,6 +69,11 @@ const ExampleWithSearch = () => {
                         </div>
                     </div>
                 </div>
+                <HtmlPreviewToggle
+                    idPrefix="deepSearch"
+                    showHtml={showHtml}
+                    setShowHtml={setShowHtml}
+                />
                 <MatchNavigator spanElements={matchData.spanElements} />
                 <HighlightSearchWrapper
                     searchString={searchString}

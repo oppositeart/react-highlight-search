@@ -5,6 +5,7 @@ import { HighlightSearchWrapper } from "../../components";
 import { OnMatchDataPropsType } from "../../types";
 
 import {
+    HtmlPreviewToggle,
     MatchNavigator,
     SampleContent,
     buildCodeSnippet,
@@ -24,6 +25,7 @@ const MultiTermSearchExample = () => {
 
     const [inputValue, setInputValue] = useState<string>(defaultValue);
     const [ignoreCase, setIgnoreCase] = useState<boolean>(true);
+    const [showHtml, setShowHtml] = useState<boolean>(false);
     const [matchData, setMatchData] = useState<OnMatchDataPropsType>({
         wrapperIndex: 0,
         matchesFound: 0,
@@ -74,13 +76,18 @@ const MultiTermSearchExample = () => {
                         </div>
                     </div>
                 </div>
+                <HtmlPreviewToggle
+                    idPrefix="multiTerm"
+                    showHtml={showHtml}
+                    setShowHtml={setShowHtml}
+                />
                 <MatchNavigator spanElements={matchData.spanElements} />
                 <HighlightSearchWrapper
                     searchString={terms}
                     ignoreCase={ignoreCase}
                     onMatchData={setMatchData}
                 >
-                    <SampleContent />
+                    <SampleContent showHtml={showHtml} />
                 </HighlightSearchWrapper>
                 <div className="returned-data">
                     <div className="header">Returned Data</div>

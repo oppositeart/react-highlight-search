@@ -189,7 +189,57 @@ export const buildCodeSnippet = (
         ">",
         ...printNode(SAMPLE_CONTENT, 1),
         "</HighlightSearchWrapper>",
+        "",
+        "// Match navigation is not built in: use spanElements from onMatchData",
+        "const goToMatch = (index) => {",
+        `${INDENT}matchData?.spanElements?.[index]?.scrollIntoView({`,
+        `${INDENT}${INDENT}block: "center",`,
+        `${INDENT}${INDENT}behavior: "smooth",`,
+        `${INDENT}});`,
+        "};",
     ].join("\n");
+
+// Toggle between the plain sample content and the version with its tags shown
+export const HtmlPreviewToggle = memo(
+    ({
+        idPrefix,
+        showHtml,
+        setShowHtml,
+    }: {
+        idPrefix: string;
+        showHtml: boolean;
+        setShowHtml: (showHtml: boolean) => void;
+    }) => (
+        <>
+            <div className="example-section-title">HTML Preview (example)</div>
+            <p className="example-section-note">
+                Not part of HighlightSearchWrapper. Shows the wrapped markup
+                with its tags, so you can see that matches are found across
+                nested elements. Switching it re-renders the children, and the
+                search re-runs automatically.
+            </p>
+            <div className="html-preview-toggle">
+                <label htmlFor={`${idPrefix}-showHtml`}>Yes</label>
+                <input
+                    type="radio"
+                    id={`${idPrefix}-showHtml`}
+                    name={`${idPrefix}-displayOption`}
+                    checked={showHtml}
+                    onChange={() => setShowHtml(true)}
+                />
+                <label htmlFor={`${idPrefix}-hideHtml`}>No</label>
+                <input
+                    type="radio"
+                    id={`${idPrefix}-hideHtml`}
+                    name={`${idPrefix}-displayOption`}
+                    checked={!showHtml}
+                    onChange={() => setShowHtml(false)}
+                />
+            </div>
+        </>
+    ),
+);
+HtmlPreviewToggle.displayName = "HtmlPreviewToggle";
 
 const ACTIVE_CLASS_NAME = "active-match";
 
@@ -233,21 +283,36 @@ export const MatchNavigator = memo(
         const count = spanElements?.length || 0;
 
         return (
-            <div className="match-navigator">
-                <button
-                    type="button"
-                    disabled={!count}
-                    onClick={() => goTo(-1)}
-                >
-                    Prev
-                </button>
-                <span className="match-position">
-                    {count ? `${activeIndex + 1} of ${count}` : "0 of 0"}
-                </span>
-                <button type="button" disabled={!count} onClick={() => goTo(1)}>
-                    Next
-                </button>
-            </div>
+            <>
+                <div className="example-section-title">
+                    Match navigation (example)
+                </div>
+                <p className="example-section-note">
+                    Not built into HighlightSearchWrapper. This demo uses the{" "}
+                    <code>spanElements</code> array from{" "}
+                    <code>onMatchData</code> to scroll to and mark matches. See
+                    the end of the code below.
+                </p>
+                <div className="match-navigator">
+                    <button
+                        type="button"
+                        disabled={!count}
+                        onClick={() => goTo(-1)}
+                    >
+                        Prev
+                    </button>
+                    <span className="match-position">
+                        {count ? `${activeIndex + 1} of ${count}` : "0 of 0"}
+                    </span>
+                    <button
+                        type="button"
+                        disabled={!count}
+                        onClick={() => goTo(1)}
+                    >
+                        Next
+                    </button>
+                </div>
+            </>
         );
     },
 );
