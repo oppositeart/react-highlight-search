@@ -4,39 +4,19 @@ import { CopyBlock, dracula } from "react-code-blocks";
 import { HighlightSearchWrapper } from "../../components";
 import { OnMatchDataPropsType } from "../../types";
 
+import {
+    MatchNavigator,
+    SampleContent,
+    buildCodeSnippet,
+} from "./sampleContent";
+
 import "./styles.css";
-
-const CODE_BLOCK = `import React from "react";
-import { HighlightSearchWrapper } from "react-highlight-search";
-
-<HighlightSearchWrapper searchString={"Search Me"}>
-    <div className={"example-of-nesting-1"}>
-        Hello World!
-        <div className={"example-of-nesting-2"}>
-            Other text example
-            <div className={"example-of-nesting-3"}>
-                Search Me!
-                <ul>
-                    <li>Search Me..</li>
-                    <li>
-                        Search Me Again! <span>Search Me!</span>
-                    </li>
-                    <li>Hello World!</li>
-                    <li>
-                        <div>
-                            <h4>Other text example</h4>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</HighlightSearchWrapper>`;
 
 const ExampleWithSearch = () => {
     const defaultValue = "Search Me";
 
     const [searchString, setSearchString] = useState<string>(defaultValue);
+    const [ignoreCase, setIgnoreCase] = useState<boolean>(true);
     const [matchData, setMatchData] = useState<OnMatchDataPropsType>({
         wrapperIndex: 0,
         matchesFound: 0,
@@ -55,10 +35,10 @@ const ExampleWithSearch = () => {
     return (
         <>
             <div className="main-wrapper">
+                <h3>Check it out!</h3>
                 <p>
-                    <h3>Check it out!</h3> Implementing deep search through a
-                    nested DOM is incredibly simple with the
-                    react-highlight-search package.
+                    Implementing deep search through a nested DOM is incredibly
+                    simple with the react-highlight-search package.
                 </p>
                 <div>
                     <p>
@@ -70,12 +50,13 @@ const ExampleWithSearch = () => {
                 <div className="controls">
                     <div>
                         <input
-                            defaultValue={defaultValue}
+                            value={searchString}
                             className="search-input"
-                            onInput={handleInputChange}
+                            aria-label="Search text"
+                            onChange={handleInputChange}
                         />
                     </div>
-                    <div className="control-show-html">
+                    <div className="control-box">
                         <div className="header">HTML Preview</div>
                         <div>
                             <label htmlFor="showHtml">Yes</label>
@@ -83,173 +64,39 @@ const ExampleWithSearch = () => {
                                 type="radio"
                                 id="showHtml"
                                 name="displayOption"
-                                onClick={() => setShowHtml(true)}
+                                checked={showHtml}
+                                onChange={() => setShowHtml(true)}
                             />
                             <label htmlFor="hideHtml">No</label>
                             <input
                                 type="radio"
                                 id="hideHtml"
                                 name="displayOption"
-                                onClick={() => setShowHtml(false)}
-                                defaultChecked
+                                checked={!showHtml}
+                                onChange={() => setShowHtml(false)}
+                            />
+                        </div>
+                    </div>
+                    <div className="control-box">
+                        <div className="header">Options</div>
+                        <div>
+                            <label htmlFor="ignoreCase">Ignore case</label>
+                            <input
+                                type="checkbox"
+                                id="ignoreCase"
+                                checked={ignoreCase}
+                                onChange={e => setIgnoreCase(e.target.checked)}
                             />
                         </div>
                     </div>
                 </div>
+                <MatchNavigator spanElements={matchData.spanElements} />
                 <HighlightSearchWrapper
                     searchString={searchString}
+                    ignoreCase={ignoreCase}
                     onMatchData={setMatchData}
                 >
-                    {showHtml ? (
-                        <>
-                            <div className="highlight-nesting-1">
-                                {'<div className={"example-of-nesting-1"}>'}
-                            </div>
-                            <div
-                                className={
-                                    "example-of-nesting-1 margin-left-25"
-                                }
-                            >
-                                Hello World!
-                                <br />
-                                <div className="highlight-nesting-2">
-                                    {'<div className={"example-of-nesting-2"}>'}
-                                </div>
-                                <div
-                                    className={
-                                        "example-of-nesting-2 margin-left-25"
-                                    }
-                                >
-                                    Other text example
-                                    <br />
-                                    <div className="highlight-nesting-3">
-                                        {
-                                            '<div className={"example-of-nesting-3"}>'
-                                        }
-                                    </div>
-                                    <div
-                                        className={
-                                            "example-of-nesting-3 margin-left-25"
-                                        }
-                                    >
-                                        Search Me!
-                                        <br />
-                                        <div className="highlight-nesting-4 margin-left-25">
-                                            {"<ul>"}
-                                        </div>
-                                        <ul>
-                                            <li>
-                                                <div className="highlight-nesting-5">
-                                                    {"<li>"}
-                                                </div>
-                                                Search Me..
-                                                <div className="highlight-nesting-5">
-                                                    {"</li>"}
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div className="highlight-nesting-5">
-                                                    {"<li>"}
-                                                </div>
-                                                Search Me Again!{" "}
-                                                <div className="highlight-nesting-6">
-                                                    {"<span>"}
-                                                </div>
-                                                <span>Search Me!</span>
-                                                <div className="highlight-nesting-6">
-                                                    {"</span>"}
-                                                </div>
-                                                <div className="highlight-nesting-5">
-                                                    {"</li>"}
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div className="highlight-nesting-5">
-                                                    {"<li>"}
-                                                </div>
-                                                Hello World!{" "}
-                                                <div className="highlight-nesting-5">
-                                                    {"</li>"}
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div className="highlight-nesting-5">
-                                                    {"<li>"}
-                                                </div>
-                                                <div className="margin-left-25">
-                                                    <div className="highlight-nesting-6">
-                                                        {"<div>"}
-                                                    </div>
-                                                    <h4
-                                                        className={
-                                                            "example-h4 margin-left-25"
-                                                        }
-                                                    >
-                                                        <div className="highlight-nesting-7">
-                                                            {"<h4>"}
-                                                        </div>
-                                                        Other text example
-                                                        <div className="highlight-nesting-7">
-                                                            {"</h4>"}
-                                                        </div>
-                                                    </h4>
-                                                    <div className="highlight-nesting-6">
-                                                        {"</div>"}
-                                                    </div>
-                                                </div>
-                                                <div className="highlight-nesting-5">
-                                                    {"</li>"}
-                                                </div>
-                                            </li>
-                                        </ul>
-                                        <div className="highlight-nesting-4">
-                                            {"</ul>"}
-                                        </div>
-                                    </div>
-                                    <div className="highlight-nesting-3">
-                                        {"</div>"}
-                                    </div>
-                                </div>
-                                <div className="highlight-nesting-2">
-                                    {"</div>"}
-                                </div>
-                            </div>
-                            <div className="highlight-nesting-1">
-                                {"</div>"}
-                            </div>
-                        </>
-                    ) : (
-                        <div className={"example-of-nesting-1"}>
-                            Hello World!
-                            <div
-                                className={
-                                    "example-of-nesting-2 margin-left-25"
-                                }
-                            >
-                                Other text example
-                                <div
-                                    className={
-                                        "example-of-nesting-3 margin-left-25"
-                                    }
-                                >
-                                    Search Me!
-                                    <ul>
-                                        <li>Search Me..</li>
-                                        <li>
-                                            Search Me Again!{" "}
-                                            <span>Search Me!</span>
-                                        </li>
-                                        <li>Hello World!</li>
-                                        <li>
-                                            <div>
-                                                <h4>Other text example</h4>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                    <SampleContent showHtml={showHtml} />
                 </HighlightSearchWrapper>
                 <div className="returned-data">
                     <div className="header">Returned Data</div>
@@ -260,13 +107,16 @@ const ExampleWithSearch = () => {
                             Span Elements:{" "}
                             {matchData.spanElements?.length ?? "null"}
                         </div>
+                        {searchString && !matchData.matchesFound && (
+                            <div className="no-matches">No matches</div>
+                        )}
                     </div>
                 </div>
             </div>
             <div className="code-block">
                 <CopyBlock
                     language={"jsx"}
-                    text={CODE_BLOCK}
+                    text={buildCodeSnippet(searchString, ignoreCase)}
                     showLineNumbers={true}
                     theme={dracula}
                     codeBlock
