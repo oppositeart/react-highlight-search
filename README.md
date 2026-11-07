@@ -10,6 +10,10 @@ Wrap any markup in `HighlightSearchWrapper`, pass a search string, and every mat
 
 **[Live demo](https://oppositeart.github.io/react-highlight-search/?path=/docs/example-deep-search-example--docs)** · [Multi-term demo](https://oppositeart.github.io/react-highlight-search/?path=/docs/example-multi-term-search-example--docs) · [Component playground](https://oppositeart.github.io/react-highlight-search/?path=/docs/example-highlightsearchwrapper--docs)
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/oppositeart/react-highlight-search/main/docs/demo.webp" alt="Typing a search term highlights every match inside the wrapped content" width="400">
+</p>
+
 ## Features
 
 - **Deep search**: finds text at any nesting level, even when a match crosses element boundaries, e.g. `Hello <b>World</b>`
